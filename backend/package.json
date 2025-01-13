@@ -1,0 +1,21 @@
+{
+  "name": "aggro-db-backend",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun --watch run src/index.ts",
+    "build": "bun build ./src/index.ts --outdir ./dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.8.2",
+    "chalk": "^5.4.1",
+    "hono": "^4.0.9"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.12",
+    "bun-types": "latest",
+    "typescript": "^5.0.0"
+  }
+}
