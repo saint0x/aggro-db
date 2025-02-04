@@ -42,8 +42,8 @@ app.get('/databases', async (c) => {
   try {
     const databases = databaseMetadataModel.list()
     return c.json({ databases })
-  } catch (error) {
-    logger.error('Failed to list databases:', error)
+  } catch (error: unknown) {
+    logger.error('Failed to list databases:', error instanceof Error ? error.message : error)
     return c.json({ error: 'Failed to list databases' }, 500)
   }
 })
@@ -60,8 +60,8 @@ app.post('/databases/test', async (c) => {
       notes: 'This is a test database'
     })
     return c.json({ database: testDb })
-  } catch (error) {
-    logger.error('Failed to create test database:', error)
+  } catch (error: unknown) {
+    logger.error('Failed to create test database:', error instanceof Error ? error.message : error)
     return c.json({ error: 'Failed to create test database' }, 500)
   }
 })
@@ -119,7 +119,7 @@ app.post('/databases/upload', async (c) => {
 
     logger.info(`Database metadata created with ID: ${database.id}`);
     return c.json({ database });
-  } catch (error) {
+  } catch (error: unknown) {
     // Clean up on error
     if (db) {
       db.close();
@@ -129,11 +129,11 @@ app.post('/databases/upload', async (c) => {
         Bun.write(storagePath, ''); // Clear file contents
         // Note: We don't delete the file as it might be needed for debugging
       } catch (cleanupError) {
-        logger.error('Failed to clean up database file:', cleanupError);
+        logger.error('Failed to clean up database file:', cleanupError instanceof Error ? cleanupError.message : cleanupError);
       }
     }
 
-    logger.error('Failed to upload database:', error);
+    logger.error('Failed to upload database:', error instanceof Error ? error.message : error);
     return c.json({ 
       error: 'Failed to upload database', 
       details: error instanceof Error ? error.message : 'Unknown error' 
@@ -155,8 +155,8 @@ app.get('/databases/:id/tables', async (c) => {
     db.close()
 
     return c.json({ tables: tables.map(t => t.name) })
-  } catch (error) {
-    logger.error('Failed to get tables:', error)
+  } catch (error: unknown) {
+    logger.error('Failed to get tables:', error instanceof Error ? error.message : error)
     return c.json({ error: 'Failed to get tables' }, 500)
   }
 })
@@ -176,8 +176,8 @@ app.get('/databases/:id/tables/:table/schema', async (c) => {
     db.close()
 
     return c.json({ schema })
-  } catch (error) {
-    logger.error('Failed to get schema:', error)
+  } catch (error: unknown) {
+    logger.error('Failed to get schema:', error instanceof Error ? error.message : error)
     return c.json({ error: 'Failed to get schema' }, 500)
   }
 })
@@ -197,9 +197,9 @@ app.post('/databases/:id/query', async (c) => {
     db.close()
 
     return c.json({ results })
-  } catch (error) {
-    logger.error('Failed to execute query:', error)
-    return c.json({ error: 'Failed to execute query', details: error.message }, 500)
+  } catch (error: unknown) {
+    logger.error('Failed to execute query:', error instanceof Error ? error.message : error)
+    return c.json({ error: 'Failed to execute query', details: error instanceof Error ? error.message : 'Unknown error' }, 500)
   }
 })
 
@@ -212,4 +212,4 @@ serve({
   port
 }, () => {
   logger.startupComplete(port)
-}) 
+})
